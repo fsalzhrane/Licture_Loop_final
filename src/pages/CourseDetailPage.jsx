@@ -117,7 +117,7 @@ const CourseDetailPage = ({ session }) => {
 
       // 3. Decrement course note count (optional, requires RPC function)
       try {
-        const { error: rpcError } = await supabase.rpc('decrement_note_count', { course_id: id });
+        const { error: rpcError } = await supabase.rpc('decrement_note_count', { course_id_param: id });
         if (rpcError) console.error('RPC decrement_note_count error:', rpcError.message);
       } catch (rpcError) {
         console.error('RPC decrement_note_count failed:', rpcError);
