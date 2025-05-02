@@ -166,10 +166,26 @@ const NoteUploadModal = ({ courseId, onClose, onNoteAdded }) => {
       }
       // --- End DB Insert ---
 
-      // --- Update course note count ---
-      const { error: rpcError } = await supabase.rpc('increment_note_count', { course_id: courseId });
-      if (rpcError) {
-          console.error('RPC error incrementing note count:', rpcError);
+      // --- Directly increment the course note count ---
+      // First get current course to get the current note_count
+      const { data: courseData, error: courseError } = await supabase
+        .from('courses')
+        .select('note_count')
+        .eq('id', courseId)
+        .single();
+
+      if (!courseError) {
+        // Then update the note_count
+        const currentCount = courseData?.note_count || 0;
+        const { error: updateError } = await supabase
+          .from('courses')
+          .update({ note_count: currentCount + 1 })
+          .eq('id', courseId);
+
+        if (updateError) {
+          console.error('Failed to update note count:', updateError.message);
+          // Continue anyway, the note is still created
+        }
       }
       // --- End Count Update ---
 

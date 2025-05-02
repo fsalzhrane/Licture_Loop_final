@@ -100,9 +100,8 @@ const CourseDetailPage = ({ session }) => {
         .from('notes')
         .remove([noteToDelete.file_path]);
 
-      // Log storage error but proceed to delete DB record anyway
       if (storageError) {
-        console.error('Storage deletion error (proceeding anyway):', storageError.message);
+        console.warn('Storage deletion warning (proceeding anyway):', storageError.message);
       }
 
       // 2. Delete note from database
@@ -112,25 +111,33 @@ const CourseDetailPage = ({ session }) => {
         .eq('id', noteToDelete.id);
 
       if (dbError) {
+        console.error('Database deletion error:', dbError);
         throw new Error('Failed to delete note from database.');
       }
 
-      // 3. Decrement course note count (optional, requires RPC function)
-      try {
-        const { error: rpcError } = await supabase.rpc('decrement_note_count', { course_id_param: id });
-        if (rpcError) console.error('RPC decrement_note_count error:', rpcError.message);
-      } catch (rpcError) {
-        console.error('RPC decrement_note_count failed:', rpcError);
+      // 3. Directly update the course's note_count in the database (subtracting 1)
+      // This is a fallback in case the database trigger isn't working
+      const { error: updateError } = await supabase
+        .from('courses')
+        .update({ note_count: Math.max(0, (course.note_count || 1) - 1) })
+        .eq('id', id);
+      
+      if (updateError) {
+        console.error('Failed to update note count:', updateError.message);
+        // Continue anyway, we'll refresh the data to get the correct count
       }
 
-      // 4. Update UI state
+      // 4. Update UI state (remove note from list)
       setNotes(notes.filter(n => n.id !== noteToDelete.id));
+      
+      // 5. Re-fetch course details to get the updated note count
+      fetchCourseDetails();
 
-      // 5. Close modal
+      // 6. Close modal
       cancelDeleteNote();
 
     } catch (error) {
-      console.error('Error deleting note:', error.message);
+      console.error('Error during note deletion process:', error.message);
       setDeleteError(error.message || 'Could not delete note. Please try again.');
     } finally {
       setNoteDeleteLoading(false);
@@ -151,12 +158,11 @@ const CourseDetailPage = ({ session }) => {
         throw notesError;
       }
 
-      // Then delete the course itself
+      // Then delete the course itself - Removed user_id check
       const { error: courseError } = await supabase
         .from('courses')
         .delete()
-        .eq('id', id)
-        .eq('user_id', session.user.id);
+        .eq('id', id);
 
       if (courseError) {
         throw courseError;
