@@ -40,7 +40,6 @@ const CourseDetailPage = ({ session }) => {
         .select('*')
         .eq('id', id)
         .single();
-        .single();
 
       if (courseError) {
         throw courseError;
