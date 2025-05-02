@@ -79,6 +79,14 @@ CREATE POLICY "Users can delete their own courses"
   TO authenticated
   USING (auth.uid() = user_id);
 
+-- Update policy to allow all authenticated users to update note_count
+CREATE POLICY "All users can update note count" 
+  ON courses
+  FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
 -- Create policies for notes
 CREATE POLICY "Users can create notes for their own courses"
   ON notes

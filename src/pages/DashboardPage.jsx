@@ -25,7 +25,6 @@ const DashboardPage = ({ session }) => {
       const { data, error } = await supabase
         .from('courses')
         .select('*')
-        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
