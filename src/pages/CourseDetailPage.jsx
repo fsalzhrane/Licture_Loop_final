@@ -39,7 +39,7 @@ const CourseDetailPage = ({ session }) => {
         .from('courses')
         .select('*')
         .eq('id', id)
-        .eq('user_id', session.user.id)
+        .single();
         .single();
 
       if (courseError) {
