@@ -53,7 +53,7 @@ const CourseModal = ({ session, onClose, onCourseAdded }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold">Create New Course</h3>
+          <h3 className="text-lg font-semibold">Add New Course</h3>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -81,7 +81,7 @@ const CourseModal = ({ session, onClose, onCourseAdded }) => {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., CS101: Introduction to Programming"
+              placeholder="e.g., CPIT405: Internet Applications"
               className="input-field"
               required
             />
@@ -115,7 +115,7 @@ const CourseModal = ({ session, onClose, onCourseAdded }) => {
               type="text"
               value={professor}
               onChange={(e) => setProfessor(e.target.value)}
-              placeholder="e.g., Dr. Jane Smith"
+              placeholder="e.g., Dr. Ahmad Tayeb"
               className="input-field"
               required
             />
@@ -131,7 +131,7 @@ const CourseModal = ({ session, onClose, onCourseAdded }) => {
               Cancel
             </button>
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? "Creating..." : "Create Course"}
+              {loading ? "Adding..." : "Add Course"}
             </button>
           </div>
         </form>

@@ -51,14 +51,14 @@ const DashboardPage = ({ session }) => {
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
-            My Courses
+            Courses
           </h1>
           <button
             onClick={() => setIsModalOpen(true)}
             className="btn-primary flex items-center"
           >
             <Plus className="mr-1" size={18} />
-            Create New Course
+            Add New Course
           </button>
         </div>
 
