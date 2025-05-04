@@ -1,28 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, FileImage, FileAudio, ExternalLink, Loader2, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  FileText,
+  FileImage,
+  FileAudio,
+  ExternalLink,
+  Loader2,
+  Trash2,
+} from "lucide-react";
 
 const NoteCard = ({ note, onDelete }) => {
-  const [textContent, setTextContent] = useState('');
+  const [textContent, setTextContent] = useState("");
   const [isLoadingText, setIsLoadingText] = useState(false);
   const [fetchError, setFetchError] = useState(null);
 
   useEffect(() => {
-    if (note.file_type === 'text' && note.file_url) {
+    if (note.file_type === "text" && note.file_url) {
       setIsLoadingText(true);
       setFetchError(null);
       fetch(note.file_url)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           return response.text();
         })
-        .then(text => {
+        .then((text) => {
           setTextContent(text);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error fetching text content:", error);
-          setFetchError('Could not load text content.');
+          setFetchError("Could not load text content.");
         })
         .finally(() => {
           setIsLoadingText(false);
@@ -31,13 +38,13 @@ const NoteCard = ({ note, onDelete }) => {
   }, [note.file_type, note.file_url]);
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   const renderNotePreview = () => {
     switch (note.file_type) {
-      case 'image':
+      case "image":
         return (
           <div className="h-40 bg-gray-100 rounded-t-md overflow-hidden flex items-center justify-center">
             <img
@@ -47,7 +54,7 @@ const NoteCard = ({ note, onDelete }) => {
             />
           </div>
         );
-      case 'audio':
+      case "audio":
         return (
           <div className="p-4 bg-gray-100 rounded-t-md">
             <div className="flex justify-center mb-3">
@@ -59,13 +66,13 @@ const NoteCard = ({ note, onDelete }) => {
             </audio>
           </div>
         );
-      case 'pdf':
+      case "pdf":
         return (
           <div className="h-40 bg-gray-100 rounded-t-md flex items-center justify-center">
             <FileText size={48} className="text-red-500" />
           </div>
         );
-      case 'text':
+      case "text":
         return (
           <div className="h-40 bg-gray-50 rounded-t-md p-3 overflow-y-auto text-sm text-gray-700 relative">
             {isLoadingText && (
@@ -79,7 +86,9 @@ const NoteCard = ({ note, onDelete }) => {
               </div>
             )}
             {!isLoadingText && !fetchError && (
-              <pre className="whitespace-pre-wrap break-words font-sans">{textContent}</pre>
+              <pre className="whitespace-pre-wrap break-words font-sans">
+                {textContent}
+              </pre>
             )}
           </div>
         );
@@ -98,17 +107,24 @@ const NoteCard = ({ note, onDelete }) => {
 
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-1">
-           <h3 className="font-medium text-gray-900 truncate flex-1 mr-2" title={note.title}>{note.title}</h3>
-           <button
-             onClick={() => onDelete(note)}
-             className="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
-             aria-label="Delete note"
-             title="Delete note"
-           >
-              <Trash2 size={16} />
-           </button>
+          <h3
+            className="font-medium text-gray-900 truncate flex-1 mr-2"
+            title={note.title}
+          >
+            {note.title}
+          </h3>
+          <button
+            onClick={() => onDelete(note)}
+            className="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
+            aria-label="Delete note"
+            title="Delete note"
+          >
+            <Trash2 size={16} />
+          </button>
         </div>
-        <p className="text-sm text-gray-500 mb-3">{formatDate(note.created_at)}</p>
+        <p className="text-sm text-gray-500 mb-3">
+          {formatDate(note.created_at)}
+        </p>
 
         <div className="mt-auto pt-3 border-t border-gray-100">
           <a

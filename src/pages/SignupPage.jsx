@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import { AlertCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import { AlertCircle } from "lucide-react";
 
 const SignupPage = ({ session }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -20,26 +20,26 @@ const SignupPage = ({ session }) => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    
+
     if (!email || !password || !confirmPassword) {
-      setError('Please fill out all fields');
+      setError("Please fill out all fields");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError("Password must be at least 6 characters long");
       return;
     }
 
     try {
       setLoading(true);
       setError(null);
-      
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -49,7 +49,7 @@ const SignupPage = ({ session }) => {
         throw error;
       }
 
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       setError(error.message);
     } finally {
@@ -60,22 +60,27 @@ const SignupPage = ({ session }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar session={session} />
-      
+
       <main className="flex-grow flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <div className="bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">Create an account</h2>
-            
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
+              Create an account
+            </h2>
+
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md flex items-start mb-6">
                 <AlertCircle className="mr-2 h-5 w-5 flex-shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
-            
+
             <form onSubmit={handleSignup}>
               <div className="mb-4">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Email
                 </label>
                 <input
@@ -88,9 +93,12 @@ const SignupPage = ({ session }) => {
                   required
                 />
               </div>
-              
+
               <div className="mb-4">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Password
                 </label>
                 <input
@@ -103,9 +111,12 @@ const SignupPage = ({ session }) => {
                   required
                 />
               </div>
-              
+
               <div className="mb-6">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Confirm Password
                 </label>
                 <input
@@ -118,20 +129,23 @@ const SignupPage = ({ session }) => {
                   required
                 />
               </div>
-              
+
               <button
                 type="submit"
                 className="btn-primary w-full"
                 disabled={loading}
               >
-                {loading ? 'Creating account...' : 'Sign up'}
+                {loading ? "Creating account..." : "Sign up"}
               </button>
             </form>
-            
+
             <div className="mt-6 text-center">
               <p className="text-gray-600">
-                Already have an account?{' '}
-                <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-primary-600 hover:text-primary-700 font-medium"
+                >
                   Log in
                 </Link>
               </p>
@@ -139,7 +153,7 @@ const SignupPage = ({ session }) => {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

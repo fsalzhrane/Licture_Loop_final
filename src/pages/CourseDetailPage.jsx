@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { uploadFile, getFileType } from '../lib/supabase';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import LoadingSpinner from '../components/LoadingSpinner';
-import NoteUploadModal from '../components/NoteUploadModal';
-import NoteCard from '../components/NoteCard';
-import { Upload, Trash2, AlertTriangle, Loader2 as SpinnerIcon } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import LoadingSpinner from "../components/LoadingSpinner";
+import NoteUploadModal from "../components/NoteUploadModal";
+import NoteCard from "../components/NoteCard";
+import {
+  Upload,
+  Trash2,
+  AlertTriangle,
+  Loader2 as SpinnerIcon,
+} from "lucide-react";
 
 const CourseDetailPage = ({ session }) => {
   const { id } = useParams();
@@ -36,9 +40,9 @@ const CourseDetailPage = ({ session }) => {
 
       // Fetch course details
       const { data: courseData, error: courseError } = await supabase
-        .from('courses')
-        .select('*')
-        .eq('id', id)
+        .from("courses")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (courseError) {
@@ -46,7 +50,7 @@ const CourseDetailPage = ({ session }) => {
       }
 
       if (!courseData) {
-        navigate('/dashboard');
+        navigate("/dashboard");
         return;
       }
 
@@ -54,10 +58,10 @@ const CourseDetailPage = ({ session }) => {
 
       // Fetch notes for this course
       const { data: notesData, error: notesError } = await supabase
-        .from('notes')
-        .select('*')
-        .eq('course_id', id)
-        .order('created_at', { ascending: false });
+        .from("notes")
+        .select("*")
+        .eq("course_id", id)
+        .order("created_at", { ascending: false });
 
       if (notesError) {
         throw notesError;
@@ -65,8 +69,8 @@ const CourseDetailPage = ({ session }) => {
 
       setNotes(notesData || []);
     } catch (error) {
-      console.error('Error fetching course details:', error.message);
-      setError('Failed to load course details. Please try again.');
+      console.error("Error fetching course details:", error.message);
+      setError("Failed to load course details. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -97,48 +101,52 @@ const CourseDetailPage = ({ session }) => {
     try {
       // 1. Delete file from storage
       const { error: storageError } = await supabase.storage
-        .from('notes')
+        .from("notes")
         .remove([noteToDelete.file_path]);
 
       if (storageError) {
-        console.warn('Storage deletion warning (proceeding anyway):', storageError.message);
+        console.warn(
+          "Storage deletion warning (proceeding anyway):",
+          storageError.message
+        );
       }
 
       // 2. Delete note from database
       const { error: dbError } = await supabase
-        .from('notes')
+        .from("notes")
         .delete()
-        .eq('id', noteToDelete.id);
+        .eq("id", noteToDelete.id);
 
       if (dbError) {
-        console.error('Database deletion error:', dbError);
-        throw new Error('Failed to delete note from database.');
+        console.error("Database deletion error:", dbError);
+        throw new Error("Failed to delete note from database.");
       }
 
       // 3. Directly update the course's note_count in the database (subtracting 1)
       // This is a fallback in case the database trigger isn't working
       const { error: updateError } = await supabase
-        .from('courses')
+        .from("courses")
         .update({ note_count: Math.max(0, (course.note_count || 1) - 1) })
-        .eq('id', id);
-      
+        .eq("id", id);
+
       if (updateError) {
-        console.error('Failed to update note count:', updateError.message);
+        console.error("Failed to update note count:", updateError.message);
         // Continue anyway, we'll refresh the data to get the correct count
       }
 
       // 4. Update UI state (remove note from list)
-      setNotes(notes.filter(n => n.id !== noteToDelete.id));
-      
+      setNotes(notes.filter((n) => n.id !== noteToDelete.id));
+
       // 5. Re-fetch course details to get the updated note count
       fetchCourseDetails();
 
       // 6. Close modal
       cancelDeleteNote();
-
     } catch (error) {
-      console.error('Error during note deletion process:', error.message);
-      setDeleteError(error.message || 'Could not delete note. Please try again.');
+      console.error("Error during note deletion process:", error.message);
+      setDeleteError(
+        error.message || "Could not delete note. Please try again."
+      );
     } finally {
       setNoteDeleteLoading(false);
     }
@@ -150,9 +158,9 @@ const CourseDetailPage = ({ session }) => {
 
       // First delete all notes related to this course
       const { error: notesError } = await supabase
-        .from('notes')
+        .from("notes")
         .delete()
-        .eq('course_id', id);
+        .eq("course_id", id);
 
       if (notesError) {
         throw notesError;
@@ -160,18 +168,18 @@ const CourseDetailPage = ({ session }) => {
 
       // Then delete the course itself - Removed user_id check
       const { error: courseError } = await supabase
-        .from('courses')
+        .from("courses")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       if (courseError) {
         throw courseError;
       }
 
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
-      console.error('Error deleting course:', error.message);
-      setError('Failed to delete course. Please try again.');
+      console.error("Error deleting course:", error.message);
+      setError("Failed to delete course. Please try again.");
     } finally {
       setDeleteLoading(false);
       setIsDeleteConfirmOpen(false);
@@ -195,9 +203,7 @@ const CourseDetailPage = ({ session }) => {
       <div className="flex flex-col min-h-screen">
         <Navbar session={session} />
         <main className="flex-grow container mx-auto px-4 py-8">
-          <div className="bg-red-50 text-red-700 p-4 rounded-md">
-            {error}
-          </div>
+          <div className="bg-red-50 text-red-700 p-4 rounded-md">{error}</div>
         </main>
         <Footer />
       </div>
@@ -207,24 +213,26 @@ const CourseDetailPage = ({ session }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar session={session} />
-      
+
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">{course.title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              {course.title}
+            </h1>
             <p className="text-gray-600">Professor: {course.professor}</p>
           </div>
-          
+
           <div className="flex space-x-3 mt-4 sm:mt-0">
-            <button 
+            <button
               onClick={() => setIsUploadModalOpen(true)}
               className="btn-primary flex items-center"
             >
               <Upload className="mr-1" size={18} />
               Upload New Note
             </button>
-            
-            <button 
+
+            <button
               onClick={() => setIsDeleteConfirmOpen(true)}
               className="btn-danger flex items-center"
             >
@@ -235,14 +243,18 @@ const CourseDetailPage = ({ session }) => {
         </div>
 
         <hr className="my-6 border-gray-200" />
-        
+
         <h2 className="text-xl font-semibold mb-4">Lecture Notes</h2>
-        
+
         {notes.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-medium text-gray-700 mb-2">No notes yet</h3>
-            <p className="text-gray-500 mb-6">Upload your first note to get started!</p>
-            <button 
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No notes yet
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Upload your first note to get started!
+            </p>
+            <button
               onClick={() => setIsUploadModalOpen(true)}
               className="btn-primary"
             >
@@ -252,11 +264,15 @@ const CourseDetailPage = ({ session }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {notes.map((note) => (
-              <NoteCard key={note.id} note={note} onDelete={handleDeleteNoteRequest} />
+              <NoteCard
+                key={note.id}
+                note={note}
+                onDelete={handleDeleteNoteRequest}
+              />
             ))}
           </div>
         )}
-        
+
         {isUploadModalOpen && (
           <NoteUploadModal
             courseId={id}
@@ -270,8 +286,9 @@ const CourseDetailPage = ({ session }) => {
             <div className="bg-white rounded-lg p-6 max-w-md w-full">
               <h3 className="text-xl font-bold mb-4">Delete Course</h3>
               <p className="mb-6 text-gray-700">
-                Are you sure you want to delete this course? This will also delete all notes
-                associated with this course. This action cannot be undone.
+                Are you sure you want to delete this course? This will also
+                delete all notes associated with this course. This action cannot
+                be undone.
               </p>
               <div className="flex justify-end space-x-3">
                 <button
@@ -286,7 +303,7 @@ const CourseDetailPage = ({ session }) => {
                   className="btn-danger"
                   disabled={deleteLoading}
                 >
-                  {deleteLoading ? 'Deleting...' : 'Delete Course'}
+                  {deleteLoading ? "Deleting..." : "Delete Course"}
                 </button>
               </div>
             </div>
@@ -298,16 +315,25 @@ const CourseDetailPage = ({ session }) => {
             <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl transform transition-all duration-200 scale-100 opacity-100">
               <div className="flex items-start space-x-3">
                 <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <AlertTriangle className="h-6 w-6 text-red-600" aria-hidden="true" />
+                  <AlertTriangle
+                    className="h-6 w-6 text-red-600"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                  <h3
+                    className="text-lg leading-6 font-medium text-gray-900"
+                    id="modal-title"
+                  >
                     Delete Note
                   </h3>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Are you sure you want to delete the note "<strong className='font-semibold'>{noteToDelete.title}</strong>"?
-                      This action cannot be undone.
+                      Are you sure you want to delete the note "
+                      <strong className="font-semibold">
+                        {noteToDelete.title}
+                      </strong>
+                      "? This action cannot be undone.
                     </p>
                   </div>
                 </div>
@@ -329,7 +355,9 @@ const CourseDetailPage = ({ session }) => {
                       <SpinnerIcon className="animate-spin -ml-1 mr-2 h-5 w-5" />
                       Deleting...
                     </span>
-                  ) : 'Delete'}
+                  ) : (
+                    "Delete"
+                  )}
                 </button>
                 <button
                   type="button"
@@ -344,7 +372,7 @@ const CourseDetailPage = ({ session }) => {
           </div>
         )}
       </main>
-      
+
       <Footer />
     </div>
   );

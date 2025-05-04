@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { supabase } from './lib/supabase';
+import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { supabase } from "./lib/supabase";
 
 // Pages
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import DashboardPage from './pages/DashboardPage';
-import CourseDetailPage from './pages/CourseDetailPage';
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import DashboardPage from "./pages/DashboardPage";
+import CourseDetailPage from "./pages/CourseDetailPage";
 
 // Components
-import LoadingSpinner from './components/LoadingSpinner';
+import LoadingSpinner from "./components/LoadingSpinner";
 
 function App() {
   const [session, setSession] = useState(null);
@@ -25,11 +25,11 @@ function App() {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
     return () => subscription.unsubscribe();
   }, []);
